@@ -48,13 +48,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       addLog('system_event', 'Forcefully resetting speech recognition engine');
       
       try {
-        // Force cleanup any existing instances
-        // const SpeechRecognition = window.SpeechRecognition || (window as any).webkitSpeechRecognition;
-        // const tempRecognition = new SpeechRecognition();
-        // tempRecognition.abort();
-        // tempRecognition.stop();
         
-        // Small delay to ensure proper cleanup
         setTimeout(() => {
           addLog('system_event', 'Speech recognition engine reset complete');
         }, 500);
