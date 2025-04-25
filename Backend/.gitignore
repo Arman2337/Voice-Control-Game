@@ -11,6 +11,7 @@ npm-debug.log*
 
 # Environment variables
 .env
+serviceAccountKey.json
 
 # IDE/editor settings
 .vscode/
