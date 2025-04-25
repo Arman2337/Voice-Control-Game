@@ -1,26 +1,3 @@
-// import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-// import Home from "./pages/Home";
-// import Login from "./pages/Login";
-// import Signup from "./pages/Signup";
-// import Dashboard from "./pages/Dashboard";
-// import { useAuth } from "./context/AuthContext";
-
-// function App() {
-//   const { user } = useAuth();
-
-//   return (
-//     <Router>
-//       <Routes>
-//         <Route path="/" element={<Home />} />
-//         <Route path="/login" element={<Login />} />
-//         <Route path="/signup" element={<Signup />} />
-//         <Route path="/dashboard" element={user ? <Dashboard /> : <Login />} />
-//       </Routes>
-//     </Router>
-//   );
-// }
-
-// export default App;
 
 // import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 // import Home from "./pages/Home";
