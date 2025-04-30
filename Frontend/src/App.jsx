@@ -40,41 +40,163 @@
 
 
 
-import { BrowserRouter as Router, Routes, Route , useNavigate } from "react-router-dom";
+// import { BrowserRouter as Router, Routes, Route , useNavigate } from "react-router-dom";
+// import Home from "./pages/Home";
+// import Login from "./pages/Login";
+// import Signup from "./pages/Signup";
+// import Dashboard from "./pages/Dashboard";
+// import QuizGame from "./pages/QuizGame";
+// import MemoryGame from "./pages/MemoryGame";
+// import { AuthProvider } from "./context/AuthContext";
+// import Header from "./components/Header";
+// import "./index.css";
+// import Leaderboard from "./pages/Leaderboard";
+// import OtpLogin from "./pages/OtpLogin";
+
+// function App() {
+//   return (
+//     <Router>
+//       <AuthProvider >
+//         <Header />
+//         <Routes>
+//           <Route path="/" element={<Home />} />
+//           <Route path="/login" element={<Login />} />
+//           <Route path="/signup" element={<Signup />} />
+//           <Route path="/dashboard" element={<Dashboard />} />
+//           <Route path="/quiz" element={<QuizGame />} />
+//           <Route path="/memory" element={<MemoryGame />} />
+//           <Route path="/leaderboard" element={<Leaderboard />} />
+//           <Route path="/otp-login" element={<OtpLogin />} />
+//         </Routes>
+//       </AuthProvider>
+//     </Router>
+//   );
+// }
+
+// export default App;
+
+
+
+
+// import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+// import Home from "./pages/Home";
+// import Login from "./pages/Login";
+// import Signup from "./pages/Signup";
+// import Dashboard from "./pages/Dashboard";
+// import QuizGame from "./pages/QuizGame";
+// import MemoryGame from "./pages/MemoryGame";
+// import { AuthProvider } from "./context/AuthContext"; // Make sure AuthContext uses MongoDB now!
+// import Header from "./components/Header";
+// import "./index.css";
+// import Leaderboard from "./pages/Leaderboard";
+// import OtpLogin from "./pages/OtpLogin";
+
+// function App() {
+//   return (
+//     <Router>
+//       <AuthProvider>
+//         <Header />
+//         <Routes>
+//           <Route path="/" element={<Home />} />
+//           <Route path="/login" element={<Login />} />
+//           <Route path="/signup" element={<Signup />} />
+//           <Route path="/dashboard" element={<Dashboard />} />
+//           <Route path="/quiz" element={<QuizGame />} />
+//           <Route path="/memory" element={<MemoryGame />} />
+//           <Route path="/leaderboard" element={<Leaderboard />} />
+//           <Route path="/otp-login" element={<OtpLogin />} />
+//         </Routes>
+//       </AuthProvider>
+//     </Router>
+//   );
+// }
+
+// export default App;
+
+
+// import { Routes, Route } from "react-router-dom";
+// import Home from "./pages/Home";
+// import Login from "./pages/Login";
+// // import Signup from "./pages/Signup";
+// // import Dashboard from "./pages/Dashboard";
+// import QuizGame from "./pages/QuizGame";
+// import MemoryGame from "./pages/MemoryGame";
+// // import { AuthProvider } from "./context/AuthContext"; // Make sure AuthContext uses MongoDB now!
+// // import { AppContextProvider } from './context/AppContext'
+// import Header from "./components/Header";
+// import "./index.css";
+// import Leaderboard from "./pages/Leaderboard";
+// import EmailVerify from './pages/EmailVerify';
+// import ResetPassword from './pages/ResetPassword'
+// import { ToastContainer } from 'react-toastify';
+
+
+// function App() {
+//   return (
+//     <div>
+//     {/* // <AppContextProvider> */}
+//     {/* <AuthProvider> */}
+//       // <Header />
+//       <ToastContainer />
+//       <Routes>
+//         <Route path="/" element={<Home />} />
+//         <Route path="/login" element={<Login />} />
+//         {/* <Route path="/signup" element={<Signup />} /> */}
+//         {/* <Route path="/dashboard" element={<Dashboard />} /> */}
+//         <Route path="/quiz" element={<QuizGame />} />
+//         <Route path="/memory" element={<MemoryGame />} />
+//         <Route path="/leaderboard" element={<Leaderboard />} />
+//         <Route path= '/email-verify' element ={<EmailVerify/>} />
+//         <Route path= '/reset-password' element ={<ResetPassword/>} />
+//       </Routes>
+//     {/* </AuthProvider> */}
+//     {/* // </AppContextProvider> */}
+//     </div>
+//   );
+// }
+
+// export default App;
+
+
+import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-import Dashboard from "./pages/Dashboard";
+// import Signup from "./pages/Signup";
+// import Dashboard from "./pages/Dashboard";
 import QuizGame from "./pages/QuizGame";
 import MemoryGame from "./pages/MemoryGame";
-import { AuthProvider } from "./context/AuthContext";
+import { AppContextProvider } from './context/AppContext';  // Only AppContextProvider
 import Header from "./components/Header";
 import "./index.css";
 import Leaderboard from "./pages/Leaderboard";
-import OtpLogin from "./pages/OtpLogin";
+import EmailVerify from './pages/EmailVerify';
+import ResetPassword from './pages/ResetPassword';
+import { ToastContainer } from 'react-toastify';
 
 function App() {
   return (
-    <Router>
-      <AuthProvider >
+    <div>
+      {/* Wrap the app with AppContextProvider to manage the global state */}
+      <AppContextProvider>
         <Header />
+        <ToastContainer />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          {/* <Route path="/signup" element={<Signup />} /> */}
+          {/* <Route path="/dashboard" element={<Dashboard />} /> */}
           <Route path="/quiz" element={<QuizGame />} />
           <Route path="/memory" element={<MemoryGame />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
-          <Route path="/otp-login" element={<OtpLogin />} />
+          <Route path='/email-verify' element={<EmailVerify />} />
+          <Route path='/reset-password' element={<ResetPassword />} />
         </Routes>
-      </AuthProvider>
-    </Router>
+      </AppContextProvider>
+    </div>
   );
 }
 
 export default App;
-
 
 
 // import React from 'react';

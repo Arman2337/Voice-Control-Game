@@ -1103,136 +1103,355 @@
 // export default Login;
 
 
-import React, { useState } from "react";
-import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
-import { FaGoogle, FaUserPlus } from "react-icons/fa";
+// import React, { useState } from "react";
+// import { useAuth } from "../context/AuthContext";
+// import { useNavigate } from "react-router-dom";
+// import { FaGoogle, FaUserPlus } from "react-icons/fa";
 
-const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+// const Login = () => {
+//   const [email, setEmail] = useState("");
+//   const [password, setPassword] = useState("");
+//   const [error, setError] = useState("");
+//   const [showPassword, setShowPassword] = useState(false);
+//   const [loading, setLoading] = useState(false);
 
-  const { loginWithProvider } = useAuth();
-  const navigate = useNavigate();
+//   const { loginWithProvider } = useAuth();
+//   const navigate = useNavigate();
   
-  const handleGoogleLogin = async () => {
-    setError("");
-    setLoading(true);
-    try {
-      await loginWithProvider(); // Will redirect
-    } catch (err) {
-      setError("Google sign-in failed.");
-      console.error("Google login error:", err);
-    } finally {
-      setLoading(false);
+//   const handleGoogleLogin = async () => {
+//     setError("");
+//     setLoading(true);
+//     try {
+//       await loginWithProvider(); // Will redirect
+//     } catch (err) {
+//       setError("Google sign-in failed.");
+//       console.error("Google login error:", err);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+  
+
+//   return (
+//     <div className="flex flex-col items-center justify-center min-h-screen bg-blue-300 text-black">
+//       <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg">
+//         <h2 className="text-2xl font-bold text-center mb-6">Login</h2>
+//         {error && (
+//           <p className="text-red-500 text-center mb-4" role="alert">
+//             {error}
+//           </p>
+//         )}
+
+//         <form
+//           onSubmit={(e) => {
+//             e.preventDefault();
+//             setError("Email/password login is disabled. Please use Google login.");
+//           }}
+//           className="space-y-4"
+//         >
+//           <div>
+//             <input
+//               type="email"
+//               placeholder="Email"
+//               value={email}
+//               onChange={(e) => setEmail(e.target.value)}
+//               className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+//               required
+//               disabled={loading}
+//             />
+//           </div>
+//           <div className="relative">
+//             <input
+//               type={showPassword ? "text" : "password"}
+//               placeholder="Password"
+//               value={password}
+//               onChange={(e) => setPassword(e.target.value)}
+//               className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
+//               required
+//               disabled={loading}
+//             />
+//             <button
+//               type="button"
+//               className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-600"
+//               onClick={() => setShowPassword(!showPassword)}
+//               disabled={loading}
+//               aria-label={showPassword ? "Hide password" : "Show password"}
+//             >
+//               {showPassword ? "🙈" : "👁"}
+//             </button>
+//           </div>
+//           <button
+//             type="submit"
+//             className={`w-full p-3 rounded transition ${
+//               loading
+//                 ? "bg-gray-500 cursor-not-allowed text-white"
+//                 : "bg-gray-800 text-white hover:bg-gray-900"
+//             }`}
+//             disabled={loading}
+//           >
+//             {loading ? "Logging in..." : "Login"}
+//           </button>
+//         </form>
+
+//         <div className="my-4 text-center text-gray-500">OR</div>
+
+//         <div className="grid grid-cols-2 gap-4">
+//           <button
+//             onClick={handleGoogleLogin}
+//             disabled={loading}
+//             className={`flex items-center justify-center gap-2 p-3 border rounded transition ${
+//               loading
+//                 ? "bg-gray-500 cursor-not-allowed text-white"
+//                 : "bg-black text-white hover:bg-gray-800"
+//             }`}
+//             aria-label="Login with Google"
+//           >
+//             {loading ? (
+//               "Redirecting..."
+//             ) : (
+//               <>
+//                 <FaGoogle className="text-red-500" /> Google
+//               </>
+//             )}
+//           </button>
+//           <button
+//             onClick={() => navigate("/signup")}
+//             disabled={loading}
+//             className={`flex items-center justify-center gap-2 p-3 border rounded transition ${
+//               loading
+//                 ? "bg-gray-500 cursor-not-allowed text-white"
+//                 : "bg-black text-white hover:bg-gray-800"
+//             }`}
+//             aria-label="Sign up"
+//           >
+//             <FaUserPlus className="text-blue-400" /> Sign Up
+//           </button>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Login;
+
+
+  import React, { useContext, useState } from 'react'
+  import { assets } from '../assets/assets'
+  import { useNavigate } from 'react-router-dom'
+  import { AppContext } from '../context/AppContext'
+  import axios from 'axios'
+  import {toast} from 'react-toastify'
+
+
+
+  const Login = () => {
+
+    const [state, setState] = useState('Sign Up')
+    const [name, setName] = useState('')
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
+
+
+    const navigate =  useNavigate()
+    const {backendUrl, setIsLogin, getUserData} = useContext(AppContext)
+
+
+    const onSubmitHandler = async (e) => {
+      try {
+          e.preventDefault()
+          axios.defaults.withCredentials = true //this will send cookies with every request
+          if(state === 'Sign Up'){
+          const {data} =   await axios.post(backendUrl + '/api/auth/register', {name, email, password})
+            console.log(data)
+            if(data.success){
+              setIsLogin(true)
+              toast.success('Sign up successful! Redirecting...');
+          navigate('/quiz'); 
+            }else{
+              toast.error(data.message)
+            }
+
+          }else{
+            const {data} =   await axios.post(backendUrl + '/api/auth/login', {email, password})
+            console.log(data)
+            if(data.success){
+              setIsLogin(true)
+              getUserData()
+              navigate('/')
+            }else{
+              toast.error(data.message)
+            }
+          }
+      }catch(error) {
+        toast.error(error.message)
+        
+      }
     }
-  };
-  
 
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-blue-300 text-black">
-      <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg">
-        <h2 className="text-2xl font-bold text-center mb-6">Login</h2>
-        {error && (
-          <p className="text-red-500 text-center mb-4" role="alert">
-            {error}
-          </p>
-        )}
-
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            setError("Email/password login is disabled. Please use Google login.");
-          }}
-          className="space-y-4"
-        >
-          <div>
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-              disabled={loading}
-            />
-          </div>
-          <div className="relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
-              required
-              disabled={loading}
-            />
-            <button
-              type="button"
-              className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-600"
-              onClick={() => setShowPassword(!showPassword)}
-              disabled={loading}
-              aria-label={showPassword ? "Hide password" : "Show password"}
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-200 to-indigo-600 px-4">
+        {/* Logo (optional) */}
+        {/* <img onClick={() => navigate('/')} src={assets.logo} className="absolute left-5 sm:left-20 top-5 w-28 sm:w-32 cursor-pointer" /> */}
+    
+        <div className="bg-slate-900 p-8 sm:p-10 rounded-2xl shadow-2xl w-full max-w-md text-indigo-300 text-sm">
+          <h2 className="text-3xl font-bold text-white text-center mb-2">{state === 'Sign Up' ? 'Create Account' : 'Login'}</h2>
+          <p className="text-center text-gray-400 mb-6">{state === 'Sign Up' ? 'Create your account' : 'Login to your account!'}</p>
+    
+          <form onSubmit={onSubmitHandler} className="space-y-4">
+            {state === 'Sign Up' && (
+              <div className="flex items-center gap-3 w-full px-5 py-3 rounded-full bg-[#333A5C]">
+                <img src={assets.person_icon} alt="Person Icon" />
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Full Name"
+                  required
+                  className="bg-transparent flex-1 text-white outline-none"
+                />
+              </div>
+            )}
+    
+            <div className="flex items-center gap-3 w-full px-5 py-3 rounded-full bg-[#333A5C]">
+              <img src={assets.mail_icon} alt="Mail Icon" />
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email id"
+                required
+                className="bg-transparent flex-1 text-white outline-none"
+              />
+            </div>
+    
+            <div className="flex items-center gap-3 w-full px-5 py-3 rounded-full bg-[#333A5C]">
+              <img src={assets.lock_icon} alt="Lock Icon" />
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+                required
+                className="bg-transparent flex-1 text-white outline-none"
+              />
+            </div>
+    
+            <p
+              onClick={() => navigate('/reset-password')}
+              className="text-right text-indigo-400 text-xs cursor-pointer hover:underline"
             >
-              {showPassword ? "🙈" : "👁"}
+              Forgot password?
+            </p>
+    
+            <button
+              type="submit"
+              className="w-full py-3 rounded-full bg-gradient-to-r from-indigo-500 to-indigo-900 text-white font-semibold hover:opacity-90 transition"
+            >
+              {state}
             </button>
-          </div>
-          <button
-            type="submit"
-            className={`w-full p-3 rounded transition ${
-              loading
-                ? "bg-gray-500 cursor-not-allowed text-white"
-                : "bg-gray-800 text-white hover:bg-gray-900"
-            }`}
-            disabled={loading}
-          >
-            {loading ? "Logging in..." : "Login"}
-          </button>
-        </form>
-
-        <div className="my-4 text-center text-gray-500">OR</div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <button
-            onClick={handleGoogleLogin}
-            disabled={loading}
-            className={`flex items-center justify-center gap-2 p-3 border rounded transition ${
-              loading
-                ? "bg-gray-500 cursor-not-allowed text-white"
-                : "bg-black text-white hover:bg-gray-800"
-            }`}
-            aria-label="Login with Google"
-          >
-            {loading ? (
-              "Redirecting..."
+          </form>
+    
+          <div className="text-center mt-6 text-xs text-gray-400">
+            {state === 'Sign Up' ? (
+              <>
+                Already have an account?{' '}
+                <span
+                  onClick={() => setState('Login')}
+                  className="text-blue-400 underline cursor-pointer"
+                >
+                  Login here
+                </span>
+              </>
             ) : (
               <>
-                <FaGoogle className="text-red-500" /> Google
+                Don't have an account?{' '}
+                <span
+                  onClick={() => setState('Sign Up')}
+                  className="text-blue-400 underline cursor-pointer"
+                >
+                  Sign up
+                </span>
               </>
             )}
-          </button>
-          <button
-            onClick={() => navigate("/signup")}
-            disabled={loading}
-            className={`flex items-center justify-center gap-2 p-3 border rounded transition ${
-              loading
-                ? "bg-gray-500 cursor-not-allowed text-white"
-                : "bg-black text-white hover:bg-gray-800"
-            }`}
-            aria-label="Sign up"
-          >
-            <FaUserPlus className="text-blue-400" /> Sign Up
-          </button>
+          </div>
         </div>
       </div>
-    </div>
-  );
-};
+    );
+    
+  }
 
-export default Login;
+  export default Login
+
+
+
+// import React, { useState, useEffect } from "react";
+// import { useAuth } from "../context/AuthContext";
+// import { useNavigate } from "react-router-dom";
+// import { FaGoogle, FaUserPlus } from "react-icons/fa";
+
+// const Login = () => {
+//   const [error, setError] = useState("");
+//   const [loading, setLoading] = useState(false);
+//   const { loginWithProvider } = useAuth();
+//   const navigate = useNavigate();
+
+//   const handleGoogleLogin = async () => {
+//     setError("");
+//     setLoading(true);
+//     try {
+//       const userCredential = await loginWithProvider(); // Google Login
+
+//       if (userCredential?.user?.email) {
+//         localStorage.setItem("otp-email", userCredential.user.email); // Save email
+//         navigate("/otp-login"); // ✅ Redirect to OTP Page
+//       } else {
+//         setError("Google login failed. No user data.");
+//       }
+//     } catch (err) {
+//       console.error("Google login error:", err);
+//       setError("Google sign-in failed.");
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   return (
+//     <div className="flex flex-col items-center justify-center min-h-screen bg-blue-300 text-black">
+//       <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg">
+//         <h2 className="text-2xl font-bold text-center mb-6">Login</h2>
+//         {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+
+//         <div className="space-y-4">
+//           <button
+//             onClick={handleGoogleLogin}
+//             disabled={loading}
+//             className={`flex items-center justify-center gap-2 w-full p-3 border rounded transition ${
+//               loading
+//                 ? "bg-gray-500 cursor-not-allowed text-white"
+//                 : "bg-black text-white hover:bg-gray-800"
+//             }`}
+//           >
+//             {loading ? "Redirecting..." : (<><FaGoogle className="text-red-500" /> Continue with Google</>)}
+//           </button>
+
+//           <button
+//             onClick={() => navigate("/signup")}
+//             disabled={loading}
+//             className={`flex items-center justify-center gap-2 w-full p-3 border rounded transition ${
+//               loading
+//                 ? "bg-gray-500 cursor-not-allowed text-white"
+//                 : "bg-black text-white hover:bg-gray-800"
+//             }`}
+//           >
+//             <FaUserPlus className="text-blue-400" /> Create an Account
+//           </button>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Login;
 
 
 

@@ -1,36 +1,61 @@
-// import React from 'react';
+// import React, { useState, useContext } from 'react';
 // import { Link, useLocation, useNavigate } from 'react-router-dom';
 // import { Button } from "@/components/ui/button";
 // import { useAuth } from '@/context/AuthContext';
-// import { LogOut, User, Settings } from 'lucide-react';
+// import { AppContext } from '../context/AppContext.jsx'
+// import { toast } from 'react-toastify'
+// import axios from 'axios'
 
 // const Header = () => {
 //   const location = useLocation();
 //   const navigate = useNavigate();
-//   const { authState, logout } = useAuth();
+//   const { user, logout } = useAuth();
+//   const { userData, isLogin, backendUrl, setIsLogin, setUserData } = useContext(AppContext);
 
-//   // Determine if a link is active
-//   const isActive = (path) => {
-//     return location.pathname === path;
-//   };
+//   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // 🛠️ Control dropdown manually
 
-//   const handleLogout = () => {
-//     logout();
-//     navigate('/');
-//   };
+//   const isActive = (path) => location.pathname === path;
 
-//   // Safety check for authState and authState.user
-//   const userName = authState?.user?.name || 'User'; // Avoid error if authState is undefined
+//   const logOut = async () => {
+//     try {
+//       axios.defaults.withCredentials = true
+//       const { data } = await axios.post(backendUrl + '/api/auth/logout')
+//       if (data.success) {
+//         setIsLogin(false)
+//         setUserData(false)
+//         navigate('/')
+//       }
+//     } catch (error) {
+//       toast.error(error.message)
+//     }
+//   }
+
+//   const sendVerificationOpt = async () => {
+//     try {
+//       axios.defaults.withCredentials = true
+//       const { data } = await axios.post(backendUrl + '/api/auth/send-verify-otp')
+//       if (data.success) {
+//         navigate('/email-verify')
+//         toast.success(data.message)
+//       } else {
+//         toast.error(data.message)
+//       }
+//     } catch (error) {
+//       toast.error(error.message)
+//     }
+//   }
+
+//   const userName = userData?.username || userData?.email || 'User';
 
 //   return (
 //     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
 //       <div className="container flex h-16 items-center justify-between">
 //         <div className="flex items-center gap-2 mr-4">
 //           <Link to="/" className="flex items-center">
-//             <span className="text-xl font-bold ">VoiceQuest</span>
+//             <span className="text-xl font-bold">VoiceQuest</span>
 //           </Link>
 //         </div>
-        
+
 //         <nav className="flex items-center space-x-1 md:space-x-2">
 //           <Link to="/">
 //             <Button variant={isActive('/') ? 'default' : 'ghost'}>
@@ -53,26 +78,38 @@
 //             </Button>
 //           </Link>
 
-//           {authState?.user ? (
-//             <div className="flex items-center gap-2">
-//               <Button 
-//                 variant="ghost"
-//                 size="sm"
-//                 className="text-primary"
-//               >
-//                 <User className="w-4 h-4 mr-1" />
-//                 <span className="hidden sm:inline">{userName}</span>
-//               </Button>
-              
-//               <Button 
-//                 variant="outline"
-//                 size="sm"
-//                 className="flex items-center gap-1 text-red-500 hover:bg-red-50/20 hover:text-red-600"
-//                 onClick={handleLogout}
-//               >
-//                 <LogOut className="w-4 h-4" />
-//                 <span className="hidden sm:inline">Logout</span>
-//               </Button>
+//           {isLogin && userData ? (
+//             <div 
+//               className="relative" 
+//               onMouseEnter={() => setIsDropdownOpen(true)}
+//               onMouseLeave={() => setIsDropdownOpen(false)}
+//             >
+//               {/* Avatar */}
+//               <div className="flex items-center justify-center rounded-full bg-black text-white w-8 h-8 cursor-pointer">
+//                 {userData?.username?.[0]?.toUpperCase() || userData?.email?.[0]?.toUpperCase() || 'U'}
+//               </div>
+
+//               {/* Dropdown */}
+//               {isDropdownOpen && (
+//                 <div className="absolute top-full right-0 mt-2 w-40 bg-white shadow-md rounded-md z-10">
+//                   <ul className="text-sm text-gray-700">
+//                     {!userData.isAccountVerified && (
+//                       <li 
+//                         onClick={sendVerificationOpt} 
+//                         className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+//                       >
+//                         Verify Email
+//                       </li>
+//                     )}
+//                     <li 
+//                       onClick={logOut} 
+//                       className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+//                     >
+//                       Logout
+//                     </li>
+//                   </ul>
+//                 </div>
+//               )}
 //             </div>
 //           ) : (
 //             <Link to="/login">
@@ -92,31 +129,52 @@
 // };
 
 // export default Header;
-
-
-
-
-import React from 'react';
+import React, { useState, useContext } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { useAuth } from '@/context/AuthContext';
-import { LogOut, User } from 'lucide-react';
+// import { useAuth } from '@/context/AuthContext';
+import { AppContext } from '../context/AppContext.jsx'
+import { toast } from 'react-toastify'
+import axios from 'axios'
 
 const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  // const { user, logout } = useAuth();
+  const { userData, backendUrl, setIsLogin, setUserData } = useContext(AppContext);
 
-  // Determine if a link is active
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // 🛠️ Control dropdown manually
+
   const isActive = (path) => location.pathname === path;
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
+  const logOut = async () => {
+    try {
+      axios.defaults.withCredentials = true
+      const { data } = await axios.post(backendUrl + '/api/auth/logout')
+      if (data.success) {
+        setIsLogin(false)
+        setUserData(false)
+        navigate('/')
+      }
+    } catch (error) {
+      toast.error(error.message)
+    }
+  }
 
-  // Determine display name, default to "User"
-  const userName = user?.displayName || user?.email || 'User';
+  const sendVerificationOpt = async () => {
+    try {
+      axios.defaults.withCredentials = true
+      const { data } = await axios.post(backendUrl + '/api/auth/send-verify-otp')
+      if (data.success) {
+        navigate('/email-verify')
+        toast.success(data.message)
+      } else {
+        toast.error(data.message)
+      }
+    } catch (error) {
+      toast.error(error.message)
+    }
+  }
 
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -126,7 +184,7 @@ const Header = () => {
             <span className="text-xl font-bold">VoiceQuest</span>
           </Link>
         </div>
-        
+
         <nav className="flex items-center space-x-1 md:space-x-2">
           <Link to="/">
             <Button variant={isActive('/') ? 'default' : 'ghost'}>
@@ -149,26 +207,38 @@ const Header = () => {
             </Button>
           </Link>
 
-          {user ? (
-            <div className="flex items-center gap-2">
-              <Button 
-                variant="ghost"
-                size="sm"
-                className="text-primary"
-              >
-                <User className="w-4 h-4 mr-1" />
-                <span className="hidden sm:inline">{userName}</span>
-              </Button>
-              
-              <Button 
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-1 text-red-500 hover:bg-red-50/20 hover:text-red-600"
-                onClick={handleLogout}
-              >
-                <LogOut className="w-4 h-4" />
-                <span className="hidden sm:inline">Logout</span>
-              </Button>
+          {userData ? (
+            <div 
+              className="relative" 
+              onMouseEnter={() => setIsDropdownOpen(true)}
+              onMouseLeave={() => setIsDropdownOpen(false)}
+            >
+              {/* Avatar */}
+              <div className="flex items-center justify-center rounded-full bg-black text-white w-8 h-8 cursor-pointer">
+                {userData?.name?.[0]?.toUpperCase() || 'U'}
+              </div>
+
+              {/* Dropdown */}
+              {isDropdownOpen && (
+                <div className="absolute top-full right-0 mt-2 w-40 bg-white shadow-md rounded-md z-10">
+                  <ul className="text-sm text-gray-700">
+                    {!userData.isAccountVerified && (
+                      <li 
+                        onClick={sendVerificationOpt} 
+                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                      >
+                        Verify Email
+                      </li>
+                    )}
+                    <li 
+                      onClick={logOut} 
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                    >
+                      Logout
+                    </li>
+                  </ul>
+                </div>
+              )}
             </div>
           ) : (
             <Link to="/login">
