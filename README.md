@@ -142,7 +142,7 @@ npm run dev
 
 
 
-###🔐 Authentication Flow
+### 🔐 Authentication Flow
 User logs in via Google Sign-In.
 
 An OTP is sent via Gmail to the verified email.
