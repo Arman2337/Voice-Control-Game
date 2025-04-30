@@ -1,3 +1,67 @@
+// const express = require("express");
+// const router = express.Router();
+// const sendOTP = require("../otpMailer");
+
+// const otpStore = new Map(); // Store OTPs in memory (use DB in production)
+
+// // Generate & send OTP
+// // router.post("/send-otp", async (req, res) => {
+// //   const { email } = req.body;
+// //   const otp = Math.floor(100000 + Math.random() * 900000).toString();
+// //   const expiresAt = Date.now() + 5 * 60 * 1000;
+
+// //   otpStore.set(email, { otp, expiresAt });
+
+// //   try {
+// //     await sendOTP(email, otp);
+// //     res.json({ message: "OTP sent" });
+// //   } catch (err) {
+// //     res.status(500).json({ message: "Failed to send OTP", error: err });
+// //   }
+// // });
+
+// // // Verify OTP
+// // router.post("/verify-otp", (req, res) => {
+// //   const { email, otp } = req.body;
+// //   const stored = otpStore.get(email);
+
+// //   if (!stored) return res.status(400).json({ message: "No OTP found" });
+// //   if (stored.expiresAt < Date.now())
+// //     return res.status(400).json({ message: "OTP expired" });
+// //   if (stored.otp !== otp)
+// //     return res.status(400).json({ message: "Invalid OTP" });
+
+// //   // Success, delete OTP after use
+// //   otpStore.delete(email);
+// //   res.json({ message: "OTP verified", user: { email } });
+// // });
+
+
+
+// app.post("/api/auth/send-otp", async (req, res) => {
+//   const { email } = req.body;
+//   if (!email) {
+//     return res.status(400).json({ message: "Email is required" });
+//   }
+
+//   const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+//   try {
+//     await transporter.sendMail({
+//       from: "Your App <your-email@gmail.com>",
+//       to: email,
+//       subject: "Your OTP Code",
+//       text: `Your OTP is ${otp}`,
+//     });
+
+//     console.log("OTP sent to:", email);
+//     res.status(200).json({ message: "OTP sent", otp }); // you may remove `otp` in production
+//   } catch (error) {
+//     console.error("Failed to send email:", error.message);
+//     res.status(500).json({ message: "Failed to send OTP" });
+//   }
+// });
+// module.exports = router;
 
 
 // authRoutes.js
@@ -113,48 +177,294 @@
 
 
 // backend/routes/authRoutes.js
-const express = require("express");
-const router = express.Router();
-const { db } = require("../firebase");
-const { sendOtpByEmail } = require("../otpMailer");
+// const express = require("express");
+// const router = express.Router();
+// const { db } = require("../firebase");
+// const { sendOtpByEmail } = require("../otpMailer");
 
-router.post("/send-otp", async (req, res) => {
-  const { email } = req.body;
-  if (!email) return res.status(400).json({ message: "Email is required" });
+// router.post("/send-otp", async (req, res) => {
+//   const { email } = req.body;
+//   if (!email) return res.status(400).json({ message: "Email is required" });
 
-  try {
-    await sendOtpByEmail(email);
-    res.status(200).json({ message: "OTP sent" });
-  } catch (error) {
-    console.error("OTP Send Error:", error);
-    res.status(500).json({ message: "Failed to send OTP" });
-  }
-});
+//   try {
+//     await sendOtpByEmail(email);
+//     res.status(200).json({ message: "OTP sent" });
+//   } catch (error) {
+//     console.error("OTP Send Error:", error);
+//     res.status(500).json({ message: "Failed to send OTP" });
+//   }
+// });
 
-router.post("/verify-otp", async (req, res) => {
-  const { email, otp } = req.body;
-  if (!email || !otp) return res.status(400).json({ message: "Email and OTP required" });
+// router.post("/verify-otp", async (req, res) => {
+//   const { email, otp } = req.body;
+//   if (!email || !otp) return res.status(400).json({ message: "Email and OTP required" });
 
-  try {
-    const doc = await db.collection("otps").doc(email).get();
+//   try {
+//     const doc = await db.collection("otps").doc(email).get();
 
-    if (!doc.exists) {
-      return res.status(400).json({ message: "Invalid or expired OTP" });
-    }
+//     if (!doc.exists) {
+//       return res.status(400).json({ message: "Invalid or expired OTP" });
+//     }
 
-    const data = doc.data();
-    const isExpired = data.expiresAt.toDate() < new Date();
+//     const data = doc.data();
+//     const isExpired = data.expiresAt.toDate() < new Date();
 
-    if (data.otp !== otp || isExpired) {
-      return res.status(400).json({ message: "Invalid or expired OTP" });
-    }
+//     if (data.otp !== otp || isExpired) {
+//       return res.status(400).json({ message: "Invalid or expired OTP" });
+//     }
 
-    await db.collection("otps").doc(email).delete(); // clean up
-    res.status(200).json({ message: "OTP verified" });
-  } catch (error) {
-    console.error("OTP Verify Error:", error);
-    res.status(500).json({ message: "Server error" });
-  }
-});
+//     await db.collection("otps").doc(email).delete(); // clean up
+//     res.status(200).json({ message: "OTP verified" });
+//   } catch (error) {
+//     console.error("OTP Verify Error:", error);
+//     res.status(500).json({ message: "Server error" });
+//   }
+// });
 
-module.exports = router;
+// module.exports = router;
+
+
+
+// const express = require('express');
+// const router = express.Router();
+// const User = require('../models/User');
+// const nodemailer = require('nodemailer');
+
+// // Send OTP
+// router.post('/send-otp', async (req, res) => {
+//   const { email } = req.body;
+//   const otp = Math.floor(100000 + Math.random() * 900000).toString();
+//   const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+//   try {
+//     let user = await User.findOne({ email });
+//     if (!user) user = new User({ email });
+//     user.otp = otp;
+//     user.otpExpires = otpExpires;
+//     await user.save();
+
+//     // Send Email
+//     const transporter = nodemailer.createTransport({
+//       service: 'gmail',
+//       auth: {
+//         user: "shaikharman2337@gmail.com",
+//       pass: "lrehqflmbzxgzrxk",
+//       },
+//     });
+
+//     await transporter.sendMail({
+//       from: '"Voice Game" <shaikharman2337@gmail.com>',
+//       to: email,
+//       subject: 'Your OTP Code',
+//       text: `Your OTP is ${otp}`,
+//     });
+
+//     res.status(200).json({ message: 'OTP sent' });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: 'Server error' });
+//   }
+// });
+
+// // Verify OTP
+// router.post('/verify-otp', async (req, res) => {
+//   const { email, otp } = req.body;
+
+//   try {
+//     const user = await User.findOne({ email });
+//     if (!user || user.otp !== otp || user.otpExpires < Date.now()) {
+//       return res.status(400).json({ message: 'Invalid or expired OTP' });
+//     }
+
+//     user.otp = null;
+//     user.otpExpires = null;
+//     await user.save();
+
+//     res.status(200).json({ message: 'OTP verified successfully' });
+//   } catch (err) {
+//     res.status(500).json({ error: 'Server error' });
+//   }
+// });
+
+// module.exports = router;
+
+
+
+// const express = require('express');
+// const router = express.Router();
+// const User = require('../models/User');
+// const nodemailer = require('nodemailer');
+
+// // ======== SEND OTP ========
+// router.post('/send-otp', async (req, res) => {
+//   const { email } = req.body;
+//   const otp = Math.floor(100000 + Math.random() * 900000).toString();
+//   const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+//   try {
+//     let user = await User.findOne({ email });
+//     if (!user) user = new User({ email });
+//     user.otp = otp;
+//     user.otpExpires = otpExpires;
+//     await user.save();
+
+//     // Send Email
+//     const transporter = nodemailer.createTransport({
+//       service: 'gmail',
+//       auth: {
+//         user: "shaikharman2337@gmail.com",
+//         pass: "lrehqflmbzxgzrxk",
+//       },
+//     });
+
+//     await transporter.sendMail({
+//       from: '"Voice Game" <shaikharman2337@gmail.com>',
+//       to: email,
+//       subject: 'Your OTP Code',
+//       text: `Your OTP is ${otp}`,
+//     });
+
+//     res.status(200).json({ message: 'OTP sent' });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: 'Server error' });
+//   }
+// });
+
+// // ======== VERIFY OTP ========
+// router.post('/verify-otp', async (req, res) => {
+//   const { email, otp } = req.body;
+
+//   try {
+//     const user = await User.findOne({ email });
+//     if (!user || user.otp !== otp || user.otpExpires < Date.now()) {
+//       return res.status(400).json({ message: 'Invalid or expired OTP' });
+//     }
+
+//     user.otp = null;
+//     user.otpExpires = null;
+//     await user.save();
+
+//     res.status(200).json({ message: 'OTP verified successfully' });
+//   } catch (err) {
+//     res.status(500).json({ error: 'Server error' });
+//   }
+// });
+
+// // ======== GOOGLE LOGIN URL ========
+// // This route gives frontend the Google login URL
+// router.get('/google-login-url', (req, res) => {
+//   const redirectUrl = `${process.env.BACKEND_URL || 'http://localhost:5000'}/api/auth/google`;
+//   res.json({ url: redirectUrl });
+// });
+
+// // (Optional) These routes are needed if you implement Passport.js Google OAuth
+// // router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+// // router.get('/google/callback', passport.authenticate('google', { failureRedirect: '/login' }),
+// //   (req, res) => {
+// //     res.redirect('http://localhost:5173/');
+// //   });
+// router.get('/me', async (req, res) => {
+//   try {
+//     // Assuming you're using session/cookies or JWT
+//     // If using JWT, you can decode the token here and fetch the user from DB
+//     const user = await User.findById(req.user._id); // Adjust if you're storing user in session
+//     if (!user) {
+//       return res.status(404).json({ message: 'User not found' });
+//     }
+//     res.status(200).json(user); // Send the user details
+//   } catch (err) {
+//     res.status(500).json({ error: 'Server error' });
+//   }
+// });
+
+// module.exports = router;
+
+
+
+// const express = require('express');
+// const router = express.Router();
+// const User = require('../models/UserModel');
+// const nodemailer = require('nodemailer');
+
+// // Send OTP
+// router.post('/send-otp', async (req, res) => {
+//   const { email } = req.body;
+//   const otp = Math.floor(100000 + Math.random() * 900000).toString();
+//   const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+//   try {
+//     let user = await User.findOne({ email });
+//     if (!user) user = new User({ email });
+//     user.otp = otp;
+//     user.otpExpires = otpExpires;
+//     await user.save();
+
+//     // Send OTP email
+//     const transporter = nodemailer.createTransport({
+//       service: 'gmail',
+//       auth: {
+//         user: "shaikharman2337@gmail.com", // Your email
+//         pass: "lrehqflmbzxgzrxk", // Your Gmail App Password
+//       },
+//     });
+
+//     await transporter.sendMail({
+//       from: '"Voice Game" <shaikharman2337@gmail.com>',
+//       to: email,
+//       subject: 'Your OTP Code',
+//       text: `Your OTP is ${otp}`,
+//     });
+
+//     res.status(200).json({ message: 'OTP sent' });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: 'Server error' });
+//   }
+// });
+
+// // Verify OTP
+// router.post('/verify-otp', async (req, res) => {
+//   const { email, otp } = req.body;
+
+//   try {
+//     const user = await User.findOne({ email });
+//     if (!user || user.otp !== otp || user.otpExpires < Date.now()) {
+//       return res.status(400).json({ message: 'Invalid or expired OTP' });
+//     }
+
+//     user.otp = null;
+//     user.otpExpires = null;
+//     await user.save();
+
+//     res.status(200).json({ message: 'OTP verified successfully' });
+//   } catch (err) {
+//     res.status(500).json({ error: 'Server error' });
+//   }
+// });
+
+// module.exports = router;
+
+
+
+
+import express from 'express';
+import { isAuthenticated, login, logout, register, resetPassword, sendRestOtp, sendVerifyOtp, verifyEmail } from '../controllers/AuthController.js';
+import userAuth from '../middleware/userAuth.js';
+
+
+const AuthRouter = express.Router()
+
+
+AuthRouter.post('/register', register)
+AuthRouter.post('/login', login)
+AuthRouter.post('/logout', logout)
+AuthRouter.post('/send-verify-otp', userAuth, sendVerifyOtp)
+AuthRouter.post('/verify-account', userAuth, verifyEmail)
+AuthRouter.get('/is-auth', userAuth, isAuthenticated)
+AuthRouter.post('/send-reset-otp', sendRestOtp)
+AuthRouter.post('/reset-password', resetPassword)
+
+
+export default AuthRouter;

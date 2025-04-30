@@ -1,89 +1,44 @@
-// const express = require("express");
-// const cors = require("cors");
-// const gameRoutes = require("./routes/gameRoutes");
+import express from 'express'
+import cors from 'cors'
+import 'dotenv/config'
+import cookieParser from 'cookie-parser'
+import { connectDB } from './config/db.js'
+import AuthRouter from './routes/AuthRoutes.js'
+import UserRouter from './routes/UserRoutes.js'
+import gameRoutes from './routes/gameRoutes.js'
+import { saveGame, getUserScores } from './controllers/gameController.js'
+import userAuth from './middleware/userAuth.js'
 
-// const app = express();
-// app.use(cors());
-// app.use(express.json());
-
-// // Routes
-// app.use("/api/games", gameRoutes);
-
-// app.get("/", (req, res) => {
-//   res.json({ message: "Game backend is running!" });
-// });
-
-// app.post('/api/games/save', (req, res) => {
-//   // Access data from req.body
-//   const { user, gameType, score, timestamp } = req.body;
-//   // Save to DB (MongoDB, SQL, etc.) or do something with the data
-//   console.log('Game data received:', req.body);
-
-//   return res.status(200).json({ message: 'Game saved successfully' });
-// });
-
-// const PORT = process.env.PORT || 5000;
-// app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-
-
-
-// const express = require("express");
-// const cors = require("cors");
-// const gameRoutes = require("./routes/gameRoutes");
-// const authRoutes = require("./routes/authRoutes"); // ✅ Added
-
-// const app = express();
-// app.use(cors());
-// app.use(express.json());
-
-// // Game Routes
-// app.use("/api/games", gameRoutes);
-
-// // ✅ OTP Auth Routes
-// app.use("/api/auth", authRoutes);
-
-// app.get("/", (req, res) => {
-//   res.json({ message: "Game backend is running!" });
-// });
-
-// app.post("/api/games/save", (req, res) => {
-//   const { user, gameType, score, timestamp } = req.body;
-//   console.log("Game data received:", req.body);
-//   return res.status(200).json({ message: "Game saved successfully" });
-// });
-
-// const PORT = process.env.PORT || 5000;
-// app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-
-
-// backend/server.js
-
-const express = require("express");
-const cors = require("cors");
-const gameRoutes = require("./routes/gameRoutes");
-const authRoutes = require("./routes/authRoutes");
+// Connect to MongoDB
+connectDB()
+  .then(() => console.log("✅ MongoDB connected successfully"))
+  .catch(err => console.error("❌ MongoDB connection error:", err));
 
 const app = express();
-app.use(cors());
+
+// Middleware
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
 app.use(express.json());
+app.use(cookieParser());
 
-// Game Routes
-app.use("/api/games", gameRoutes);
+// Routes
+app.use('/api/auth', AuthRouter);
+app.use('/api/user', UserRouter);
+app.use('/api/games', gameRoutes);
 
-// Auth (OTP) Routes
-app.use("/api/auth", authRoutes);
-
+// Default route
 app.get("/", (req, res) => {
-  res.json({ message: "Game backend is running!" });
+  res.json({ message: "MongoDB-based Game backend is running!" });
 });
 
-app.post("/api/games/save", (req, res) => {
-  const { user, gameType, score, timestamp } = req.body;
-  console.log("Game data received:", req.body);
-  return res.status(200).json({ message: "Game saved successfully" });
-});
+// Save Game Score
+app.post("/api/games/save",userAuth,saveGame);
 
-const PORT = 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Fetch scores
+app.get("/api/games/scores/:userId", userAuth,getUserScores);
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));

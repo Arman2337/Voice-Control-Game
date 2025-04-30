@@ -1,41 +1,73 @@
-// const express = require("express");
-// const router = express.Router();
-
-// // Dummy database (Replace with real DB)
-// const gameResults = [];
-
-// router.post("/save", (req, res) => {
-//     const { user, gameType, score, timestamp } = req.body;
-
-//     if (!user || !gameType || score === undefined || !timestamp) {
-//         return res.status(400).json({ error: "Missing required fields" });
-//     }
-
-//     const gameData = { user, gameType, score, timestamp };
-//     gameResults.push(gameData);
-
-//     res.json({ message: "Game data saved successfully", data: gameData });
-// });
-
-// router.get("/scores", (req, res) => {
-//     res.json({ scores: gameResults });
-// });
-
-// module.exports = router;
-
-
-const express = require("express");
-const { db } = require("../firebase");
+import express from 'express';
+import GameScore from '../models/GameScore.js';
+import userAuth from '../middleware/userAuth.js';
 
 const router = express.Router();
 
-router.get("/testFirebase", async (req, res) => {
+// Test MongoDB connection
+router.get('/testMongo', async (req, res) => {
   try {
-    const snapshot = await db.collection("test").get();
-    res.json({ message: "Firebase is connected!", count: snapshot.size });
+    const count = await GameScore.countDocuments();
+    res.json({ message: 'MongoDB is connected!', count });
   } catch (error) {
-    res.status(500).json({ error: "Firebase connection failed", details: error.message });
+    res.status(500).json({ error: 'MongoDB connection failed', details: error.message });
   }
 });
 
-module.exports = router;
+// Save a new score
+router.post('/save', userAuth ,async (req, res) => {
+  try {
+    const { name, score, userId, gameType } = req.body;
+    console.log('Received score data:', req.body);
+
+    if (typeof score !== 'number' || !gameType || !userId) {
+      return res.status(400).json({ error: 'userId, gameType, and numeric score are required' });
+    }
+
+    const newScore = new GameScore({
+      name: name || "Anonymous",
+      score,
+      userId,
+      gameType,
+      timestamp: Date.now()
+    });
+
+    await newScore.save();
+    res.status(201).json({ message: 'Score saved successfully!' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to save score', details: error.message });
+  }
+});
+
+// Get leaderboard (top scores)
+router.get('/leaderboard', async (req, res) => {
+  try {
+    const scores = await GameScore.find()
+      .sort({ score: -1 })
+      .limit(10)
+      .select('name score gameType timestamp');
+
+    res.json({ scores });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch leaderboard', details: error.message });
+  }
+});
+
+// Get user's scores
+router.get('/scores/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const scores = await GameScore.find({ userId })
+      .sort({ timestamp: -1 })
+      .select('name score gameType timestamp');
+
+    res.json({ scores });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch user scores', details: error.message });
+  }
+});
+
+export default router;
