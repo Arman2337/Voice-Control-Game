@@ -69,7 +69,6 @@ export const AppContextProvider = (props) => {
   const [isLogin, setIsLogin] = useState(false);
   const [userData, setUserData] = useState(false);
 
-  // Create a function to fetch user data
   const getUserData = async () => {
     try {
       const { data } = await axios.get(backendUrl + '/api/user/data');
@@ -133,46 +132,3 @@ export const useAppContext = () => {
   return context;
 };
 
-
-// import React, { createContext, useState, useContext, useEffect } from 'react';
-
-// // Create the context for app-wide data
-// const AppContext = createContext();
-
-// export const AppContextProvider = ({ children }) => {
-//   const backendUrl = "http://localhost:5000";
-//   const [userData, setUserData] = useState(null);
-//   const [isLogin, setIsLogin] = useState(false);
-
-//   // On initial load, check if user data exists in localStorage
-//   useEffect(() => {
-//     const savedUserData = localStorage.getItem('userData');
-//     if (savedUserData) {
-//       setUserData(JSON.parse(savedUserData));
-//       setIsLogin(true);
-//     }
-//   }, []);
-
-//   // Login function to update context and localStorage
-//   const login = (user) => {
-//     setUserData(user);
-//     setIsLogin(true);
-//     localStorage.setItem('userData', JSON.stringify(user));
-//   };
-
-//   // Logout function to clear context and localStorage
-//   const logout = () => {
-//     setUserData(null);
-//     setIsLogin(false);
-//     localStorage.removeItem('userData');
-//   };
-
-//   return (
-//     <AppContext.Provider value={{ userData, isLogin, login, logout }}>
-//       {children}
-//     </AppContext.Provider>
-//   );
-// };
-
-// export const useAppContext = () => useContext(AppContext);
-// export { AppContext };
