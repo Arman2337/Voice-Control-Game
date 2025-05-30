@@ -1,6 +1,4 @@
-// File: otpMailer.js
 
-// backend/otpMailer.js
 
 const nodemailer = require("nodemailer");
 const { db } = require("./firebase");
