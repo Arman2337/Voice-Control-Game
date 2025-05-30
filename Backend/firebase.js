@@ -1,6 +1,6 @@
-// backend/firebase.js
+
 const admin = require("firebase-admin");
-const serviceAccount = require("./serviceAccountKey.json"); // Download from Firebase Console
+const serviceAccount = require("./serviceAccountKey.json"); 
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -9,7 +9,7 @@ admin.initializeApp({
 
 const db = admin.firestore();
 
-// Test connection
+
 db.collection("test").add({ message: "Firebase connected!" })
   .then(() => console.log("🔥 Firebase is connected successfully!"))
   .catch((error) => console.error("❌ Firebase connection failed:", error));
