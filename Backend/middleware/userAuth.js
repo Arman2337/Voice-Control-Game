@@ -1,14 +1,3 @@
-//Why this middleware is needed ?
-  
-
-/*
-In the sendVerifyOtp, verifyEmail in this two controller we are geeting
-userId from req.body. but in ui we are sending userId.
-
-so using middleware function we are getting token from cookie and 
-we are getting userId from that token. 
-
-*/
 
 
 import jwt from 'jsonwebtoken';
