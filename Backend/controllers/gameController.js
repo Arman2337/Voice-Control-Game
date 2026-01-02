@@ -33,11 +33,12 @@
 import GameScore from '../models/GameScore.js';
 
 export const saveGame = async (req, res) => {
-  const { name, score, userId, gameType } = req.body;
+  const { name, score, gameType } = req.body;
+  const userId = req.userId;
 
   // Validate the required fields
   if (!userId || !gameType || typeof score !== 'number') {
-    return res.status(400).json({ error: "userId, gameType, and score are required" });
+    return res.status(400).json({ error: "userId (auth), gameType, and score are required" });
   }
 
   try {
