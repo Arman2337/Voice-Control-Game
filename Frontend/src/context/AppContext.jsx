@@ -58,7 +58,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import axios from 'axios';
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 export const AppContext = createContext();
 
@@ -99,7 +99,12 @@ export const AppContextProvider = (props) => {
         getUserData();
       }
     } catch (error) {
-      toast.error(error.message);
+      if (error.response && error.response.status === 401) {
+        // User is not authenticated, just stay in guest mode
+        setIsLogin(false);
+      } else {
+        toast.error(error.message);
+      }
     }
   };
 
